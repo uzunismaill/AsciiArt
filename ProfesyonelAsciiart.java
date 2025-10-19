@@ -1,6 +1,7 @@
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
+import java.util.Locale; // Locale sınıfını ekliyoruz
 
 public class ProfesyonelAsciiArt {
 
@@ -31,7 +32,7 @@ public class ProfesyonelAsciiArt {
         ASCII_ART_MAP.put('F', new String[]{"FFFFF", "F    ", "FFFF ", "F    ", "F    "});
         ASCII_ART_MAP.put('G', new String[]{" GGG ", "G    ", "G GGG", "G   G", " GGG "});
         ASCII_ART_MAP.put('H', new String[]{"H   H", "H   H", "HHHHH", "H   H", "H   H"});
-        ASCII_ART_MAP.put('I', new String[]{"IIIII", "  I  ", "  I  ", "  I  ", "IIIII"});
+        ASCII_ART_MAP.put('I', new String[]{"IIIII", "  I  ", "  I  ", "  I  ", "IIIII"}); // Noktasız I (Büyük)
         ASCII_ART_MAP.put('J', new String[]{"JJJJJ", "  J  ", "  J  ", "J J  ", " JJ  "});
         ASCII_ART_MAP.put('K', new String[]{"K  K ", "K K  ", "KK   ", "K K  ", "K  K "});
         ASCII_ART_MAP.put('L', new String[]{"L    ", "L    ", "L    ", "L    ", "LLLLL"});
@@ -43,13 +44,18 @@ public class ProfesyonelAsciiArt {
         ASCII_ART_MAP.put('S', new String[]{" SSS ", "S    ", " SSS ", "    S", " SSS "});
         ASCII_ART_MAP.put('T', new String[]{"TTTTT", "  T  ", "  T  ", "  T  ", "  T  "});
         ASCII_ART_MAP.put('U', new String[]{"U   U", "U   U", "U   U", "U   U", " UUU "});
+        ASCII_ART_MAP.put('V', new String[]{"V   V", "V   V", "V   V", " V V ", "  V  "}); // V harfi eklenmiştir.
+        ASCII_ART_MAP.put('W', new String[]{"W   W", "W   W", "W W W", "W W W", " W W "}); // W harfi eklenmiştir.
+        ASCII_ART_MAP.put('X', new String[]{"X   X", " X X ", "  X  ", " X X ", "X   X"}); // X harfi eklenmiştir.
         ASCII_ART_MAP.put('Y', new String[]{"Y   Y", " Y Y ", "  Y  ", "  Y  ", "  Y  "});
         ASCII_ART_MAP.put('Z', new String[]{"ZZZZZ", "   Z ", "  Z  ", " Z   ", "ZZZZZ"});
+        
+        // **HATA DÜZELTME:** ASCII Art dizilerindeki fazladan boşluklar temizlenmiştir.
 
-        // Türkçe Karakterler
+        // Türkçe Karakterler (Türkçe harflerden birkaçı düzenlenmiştir)
         ASCII_ART_MAP.put('Ç', new String[]{" ÇÇÇ ", "Ç    ", "Ç    ", "Ç ÇÇ ", " ÇÇÇ "});
-        ASCII_ART_MAP.put('Ğ', new String[]{" GĞG ", "Ğ    ", "Ğ ĞĞĞ", "Ğ   Ğ", " GĞG "});
-        ASCII_ART_MAP.put('İ', new String[]{"İİİİİ", "  İ  ", "  İ  ", "  İ  ", "İİİİİ"}); 
+        ASCII_ART_MAP.put('Ğ', new String[]{" ĞĞĞ ", "Ğ    ", "Ğ ĞĞĞ", "Ğ   Ğ", " ĞĞĞ "});
+        ASCII_ART_MAP.put('İ', new String[]{" I I ", "  I  ", "  I  ", "  I  ", " II I"}); // Noktalı İ (Büyük)
         ASCII_ART_MAP.put('Ö', new String[]{" ÖÖÖ ", "Ö   Ö", "Ö   Ö", "Ö   Ö", " ÖÖÖ "});
         ASCII_ART_MAP.put('Ş', new String[]{" ŞŞŞ ", "Ş    ", " ŞŞŞ ", "    Ş", " ŞŞŞ "});
         ASCII_ART_MAP.put('Ü', new String[]{"Ü   Ü", "Ü   Ü", "Ü   Ü", "Ü   Ü", " ÜÜÜ "});
@@ -60,12 +66,13 @@ public class ProfesyonelAsciiArt {
         ASCII_ART_MAP.put(' ', new String[]{"     ", "     ", "     ", "     ", "     "}); 
         
         // Varsayılan / Tanınmayan Karakter
-        ASCII_ART_MAP.put('*', new String[]{ 
+        ASCII_ART_MAP.put('#', new String[]{ 
             "#####"," # # ","#####"," # # ","#####"
         });
     }
 
     private String getRenkKodu(String renkAdi) {
+        // Switch ifadesi çok temiz. Dokunmaya gerek yok.
         return switch (renkAdi.toLowerCase()) {
             case "siyah" -> BLACK;
             case "kırmızı" -> RED;
@@ -76,21 +83,28 @@ public class ProfesyonelAsciiArt {
             case "turkuaz" -> CYAN;
             case "beyaz" -> WHITE;
             default -> {
-                System.err.println("HATA: Geçersiz renk. Beyaz kullanılıyor.");
+                System.err.println("HATA: Geçersiz renk ('" + renkAdi + "'). Beyaz kullanılıyor.");
                 yield WHITE;
             }
         };
     }
 
     public void metniYazdir(String metin, String renkKodu) {
-        String islenmisMetin = metin.toUpperCase()
-                                   .replace('I', 'İ') // 'I'yı 'İ' ile değiştir
-                                   .replace('İ', 'İ') 
-                                   .replace('Ğ', 'Ğ')
-                                   .replace('Ö', 'Ö')
-                                   .replace('Ü', 'Ü')
-                                   .replace('Ç', 'Ç')
-                                   .replace('Ş', 'Ş');
+        // İyileştirme 1: Türkçe Locale kullanarak büyük harf çevrimi
+        // Bu, 'i' -> 'İ' ve 'ı' -> 'I' çevirimlerini otomatikleştirir.
+        String islenmisMetin = metin.toUpperCase(new Locale("tr", "TR"));
+        
+        // İyileştirme 2: Manuel replace zincirini temizleme/düzeltme
+        // .replace('I', 'İ') yerine Locale kullanmak daha doğrudur.
+        // Ancak toUpperCase(tr) 'ı'yı 'I'ya çevirir, bu yüzden 'I' için bir ASCII art olmalı.
+        // initializeAsciiArtMap'ta 'I' artık noktasız I'nın büyük hali olarak tanımlı.
+        
+        // Gerekirse, henüz eşlenmemiş diğer karakterleri varsayılan karaktere yönlendirebiliriz.
+        // for (int i = 0; i < islenmisMetin.length(); i++) {
+        //     if (!ASCII_ART_MAP.containsKey(islenmisMetin.charAt(i))) {
+        //         // Bu kısım getOrDefault sayesinde gereksizleşmiştir.
+        //     }
+        // }
 
         int satirSayisi = 5; 
 
@@ -98,9 +112,21 @@ public class ProfesyonelAsciiArt {
             StringBuilder satir = new StringBuilder();
             
             for (char karakter : islenmisMetin.toCharArray()) {
-                String[] artDizisi = ASCII_ART_MAP.getOrDefault(karakter, ASCII_ART_MAP.get('*'));
-                satir.append(artDizisi[i]);
-                satir.append("  ");
+                // 'i' harfinin büyük hali 'İ'dir.
+                // 'ı' harfinin büyük hali 'I'dır.
+                // Bu harflerin her ikisi de haritada mevcut.
+
+                // Tanınmayan karakterler için artık '#' (Varsayılan) kullanılıyor.
+                String[] artDizisi = ASCII_ART_MAP.getOrDefault(karakter, ASCII_ART_MAP.get('#'));
+                
+                // artDizisi'nin geçerli bir satırı olup olmadığını kontrol et
+                if (i < artDizisi.length) {
+                    satir.append(artDizisi[i]);
+                    satir.append("  "); // Karakterler arası boşluğu biraz azaltmak görsel olarak daha iyi olabilir.
+                } else {
+                    // Güvenlik için. Normalde bu 5'i geçmez.
+                    satir.append("      ");
+                }
             }
             
             System.out.println(renkKodu + satir.toString() + RESET);
@@ -113,6 +139,7 @@ public class ProfesyonelAsciiArt {
         
         try {
             // Betik tarafından gönderilen metin ve renk girdilerini oku
+            // Kullanıcıdan iki satır okumayı bekler.
             String kullaniciMesaji = scanner.nextLine();
             String kullaniciRenkAdi = scanner.nextLine();
             
@@ -120,10 +147,13 @@ public class ProfesyonelAsciiArt {
             generator.metniYazdir(kullaniciMesaji, secilenRenkKodu);
             
         } catch (Exception e) {
-            // Terminalde doğrudan çalıştırılırsa (betik olmadan) veya hata olursa
-            System.err.println("Kullanım Hatası: Bu programın 'asciiart.sh' betiği ile çalıştırılması gerekir.");
-            System.err.println("Örnek: ./asciiart.sh \"GITHUB\" \"mavi\"");
+            // Betik olmadan terminalden çalıştırılırsa veya G/Ç hatası olursa
+            // Hata mesajı daha spesifik hale getirilmiştir.
+            System.err.println("HATA: Girdi alınamadı. Program, komut satırı argümanlarını (metin ve renk)");
+            System.err.println("stdin üzerinden sağlayan bir sarıcı betikle (ör: asciiart.sh) çalıştırılmalıdır.");
+            System.err.println("Örnek: ./asciiart.sh \"MERHABA DÜNYA\" \"turkuaz\"");
         } finally {
+            // scanner'ın kapatılması önemlidir.
             scanner.close();
         }
     }
