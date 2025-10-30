@@ -3,7 +3,7 @@ import java.util.Map;
 import java.util.Scanner;
 import java.util.Locale; // Locale sınıfını ekliyoruz
 
-public class ProfesyonelAsciiArt {
+public class ProfesyonelAsciiart {
 
     // Renk kodları için ANSI tanımları
     public static final String RESET = "\u001B[0m";
@@ -75,7 +75,7 @@ public class ProfesyonelAsciiArt {
         // Switch ifadesi çok temiz. Dokunmaya gerek yok.
         return switch (renkAdi.toLowerCase()) {
             case "siyah" -> BLACK;
-            case "kırmızı" -> RED;
+            case "kirmizi" -> RED;
             case "yeşil" -> GREEN;
             case "sarı" -> YELLOW;
             case "mavi" -> BLUE;
@@ -134,7 +134,7 @@ public class ProfesyonelAsciiArt {
     }
 
     public static void main(String[] args) {
-        ProfesyonelAsciiArt generator = new ProfesyonelAsciiArt();
+        ProfesyonelAsciiart generator = new ProfesyonelAsciiart();
         Scanner scanner = new Scanner(System.in);
         
         try {
